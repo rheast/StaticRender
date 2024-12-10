@@ -1,0 +1,66 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="rheast.js"></script>
+    <style>
+        .red {
+            color: red;
+        }
+
+        .blue {
+            color: blue;
+        }
+
+        li {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li _for="myData">
+            <div class="{class}">
+                <span>{_index}</span>
+                <span>{name}</span>
+            </div>
+            <div>
+                <div _for="data">
+                    <label _if="{_value}">{_this}</label>
+                    <div _if="{text}">
+                        <span>{_index}</span>
+                        <span>{time}</span>
+                        <span>{text}</span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+
+    <script>
+        var myData = [
+            {
+                name: 'Adam',
+                data: [16, 32, 64, 128, 256],
+            },
+            {
+                name: 'Bob',
+                data: ['Football', 'Basketball', 'Volleyball'],
+                class: 'red',
+            },
+            {
+                name: 'Claire',
+                data: [
+                    { time: 'Monday', text: 'Yesterday' },
+                    { time: 'Tuesday', text: 'Today' },
+                    { time: 'Wednesday', text: 'Tomorrow' },
+                ],
+                class: 'blue',
+            },
+        ];
+    </script>
+</body>
+
+</html>
