@@ -6,7 +6,7 @@ A lightweight JavaScript file that provides `v-for`-like functionality for data 
 - Lightweight and easy to integrate.
 - Enables efficient data rendering for static pages.
 - No dependencies or additional setup required.
-- Includes a `sample.html` file to demonstrate usage.
+- Includes a `sample.html` file to demonstrate usage. [Link Text](https://rheast.com/js/sample.html)
 
 ## Getting Started
 
