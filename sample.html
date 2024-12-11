@@ -3,19 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <script src="rheast.js"></script>
-    <style>
-        .red {
-            color: red;
-        }
-
-        .blue {
-            color: blue;
-        }
-
-        li {
-            margin-bottom: 0.5em;
-        }
-    </style>
 </head>
 
 <body>
@@ -26,24 +13,23 @@
                 <span>{name}</span>
             </div>
             <div>
-                <div _for="data">
-                    <label _if="{_value}">{_this}</label>
-                    <div _if="{text}">
-                        <span>{_index}</span>
-                        <span>{time}</span>
-                        <span>{text}</span>
-                    </div>
+                <span _for="data" _if="{_value}">
+                    <span>{_this}</span>
+                </span>
+                <div _for="data" _if="{text}">
+                    <span>{_index}</span>
+                    <span>{time}</span>
+                    <span>{text}</span>
                 </div>
             </div>
         </li>
     </ul>
 
-
     <script>
         var myData = [
             {
                 name: 'Adam',
-                data: [16, 32, 64, 128, 256],
+                data: [0, 16, 32, 64, 128, 256],
             },
             {
                 name: 'Bob',
@@ -60,6 +46,10 @@
                 class: 'blue',
             },
         ];
+
+        let myStyle = document.createElement('style');
+        myStyle.textContent = '.red { color: red; } .blue { color: blue; } li { padding: .5em 0; }';
+        document.querySelector('head').appendChild(myStyle);
     </script>
 </body>
 

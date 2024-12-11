@@ -1,4 +1,19 @@
+// StaticRender v1.01 - Rheast.js
+
 class RHEast {
+    constructor() {
+        this.forStyle();
+        document.addEventListener('DOMContentLoaded', () => {
+            this.forLoad();
+        });
+    }
+
+    forStyle() {
+        let style = document.createElement('style');
+        style.textContent = '[_for] { visibility: hidden; }';
+        document.querySelector('head').appendChild(style);
+    }
+
     forLoad() {
         let name = '';
         this.forIterate((level) => {
@@ -10,9 +25,22 @@ class RHEast {
         this.forProcess(`[_level="${0}"]`, (item) => {
             this.forClone(item);
         });
-        this.forProcess(`[_if=""]`, (item) => {
-            item.remove();
+        this.forProcess('[_if]', (item) => {
+            if (!this.forCheck(item)) {
+                item.remove();
+            }
         });
+    }
+
+    forCheck(div) {
+        let attr = div.getAttribute('_if');
+        try {
+            attr = eval(attr);
+            if (!attr && typeof (attr) != typeof (1)) {
+                return false;
+            }
+        } catch (e) { }
+        return true;
     }
 
     forIterate(processor) {
@@ -75,29 +103,21 @@ class RHEast {
     }
 
     forBrackets(value, data, index) {
-        if ([typeof ('N'), typeof (1)].includes(typeof (data))) {
+        if (typeof (data) != typeof ({})) {
             data = { _this: data, _value: data };
         }
-        if (typeof (data) == typeof ({})) {
-            data._index = index;
-            let rule = /(?<=\{).*?(?=\})/g;
-            let match = value.match(rule);
-            for (let i in match) {
-                let text = match[i];
-                let info = data[text];
-                if (!info) {
-                    info = '';
-                }
-                value = value.replaceAll(`{${text}}`, info);
+        data._index = index;
+        let rule = /(?<=\{).*?(?=\})/g;
+        let match = value.match(rule);
+        for (let i in match) {
+            let text = match[i];
+            let info = '';
+            if (text in data) {
+                info = data[text];
             }
+            value = value.replaceAll(`{${text}}`, String(info));
         }
         return value;
-    }
-
-    forStyle() {
-        let style = document.createElement('style');
-        style.textContent = '[_for] { visibility: hidden; }';
-        document.querySelector('head').appendChild(style);
     }
 
     href(name) {
@@ -119,7 +139,3 @@ class RHEast {
 }
 
 const rheast = new RHEast();
-rheast.forStyle();
-document.addEventListener('DOMContentLoaded', function () {
-    rheast.forLoad();
-});
