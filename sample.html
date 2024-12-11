@@ -8,19 +8,31 @@
 <body>
     <ul>
         <li _for="myData">
-            <div class="{class}">
+            <div class="{color}">
                 <span>{_index}</span>
                 <span>{name}</span>
             </div>
             <div>
-                <span _for="data" _if="{_value}">
-                    <span>{_this}</span>
-                </span>
-                <div _for="data" _if="{text}">
+                <div _for="data" _if="time">
                     <span>{_index}</span>
                     <span>{time}</span>
                     <span>{text}</span>
                 </div>
+                <span _for="data" _else="time">
+                    <span>{_value}</span>
+                </span>
+            </div>
+        </li>
+        <li>
+            <div>
+                <span _for="[2, 0, 4, 8]">{_this}</span>
+            </div>
+        </li>
+        <li _for class="newData {color}">
+            <div>
+                <span>{name}</span>
+                <span>{age}</span>
+                <span>{city}</span>
             </div>
         </li>
     </ul>
@@ -29,12 +41,12 @@
         var myData = [
             {
                 name: 'Adam',
-                data: [0, 16, 32, 64, 128, 256],
+                data: Array.from({ length: 9 }, (_, i) => Math.pow(2, i + 1)),
             },
             {
                 name: 'Bob',
                 data: ['Football', 'Basketball', 'Volleyball'],
-                class: 'red',
+                color: 'red',
             },
             {
                 name: 'Claire',
@@ -43,9 +55,22 @@
                     { time: 'Tuesday', text: 'Today' },
                     { time: 'Wednesday', text: 'Tomorrow' },
                 ],
-                class: 'blue',
+                color: 'blue',
             },
         ];
+
+        setTimeout(() => {
+            let data = {
+                "status": 200,
+                "message": "Request successful",
+                "data": [
+                    { "name": "Alice", "age": 30, "city": "New York" },
+                    { "name": "Bob", "age": 25, "city": "Los Angeles", color: "red" },
+                    { "name": "Charlie", "age": 35, "city": "Chicago", color: "blue" },
+                ]
+            };
+            rheast.forClone('.newData', data.data);
+        }, 3000);
 
         let myStyle = document.createElement('style');
         myStyle.textContent = '.red { color: red; } .blue { color: blue; } li { padding: .5em 0; }';

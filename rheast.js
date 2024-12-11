@@ -1,4 +1,4 @@
-// StaticRender v1.01 - Rheast.js
+// StaticRender v1.02 - Rheast.js
 
 class RHEast {
     constructor() {
@@ -15,101 +15,91 @@ class RHEast {
     }
 
     forLoad() {
-        let name = '';
-        this.forIterate((level) => {
-            name += '[_for] ';
-            this.forProcess(name, (item) => {
-                item.setAttribute('_level', level);
-            });
-        });
-        this.forProcess(`[_level="${0}"]`, (item) => {
+        const box = Array.from(document.querySelectorAll('[_for]')).filter(
+            element => !Array.from(document.querySelectorAll('[_for] [_for]')).includes(element)
+        );
+        Array.from(box).forEach(item => {
             this.forClone(item);
         });
-        this.forProcess('[_if]', (item) => {
-            if (!this.forCheck(item)) {
-                item.remove();
-            }
-        });
-    }
-
-    forCheck(div) {
-        let attr = div.getAttribute('_if');
-        try {
-            attr = eval(attr);
-            if (!attr && typeof (attr) != typeof (1)) {
-                return false;
-            }
-        } catch (e) { }
-        div.removeAttribute('_if');
-        return true;
-    }
-
-    forIterate(processor) {
-        let level = 0;
-        while (true) {
-            if (!processor(level)) {
-                break;
-            }
-            level += 1;
-        }
-    }
-
-    forProcess(selector, processor) {
-        let box = document.querySelectorAll(selector);
-        Array.from(box).forEach(item => {
-            processor(item);
-        });
-        return box.length > 0;
-    }
-
-    forClean(div) {
-        let attr = ['_for', '_level'];
-        for (let a in attr) {
-            div.removeAttribute(attr[a]);
-        }
-        return div;
     }
 
     forClone(div, data) {
-        let target = div.getAttribute('_for');
-        if (!data) {
-            data = eval(target);
-        } else {
-            data = data[target];
+        if (typeof (div) == typeof ('N')) {
+            div = document.querySelector(div);
+        }
+        data = this.forData(div, data);
+        if (!div || !data) {
+            return false;
         }
         for (let i in data) {
             let clone = div.cloneNode(true);
-            this.forReplace(clone, data[i], i);
-            this.forClean(clone);
+            clone.removeAttribute('_for');
+            this.forReplace(clone, this.forValue(data[i], i), i);
+            clone.querySelectorAll('[_retard]').forEach(item => {
+                item.remove();
+            });
             div.parentNode.insertBefore(clone, div);
         }
         div.remove();
     }
 
-    forReplace(div, data, index) {
+    forData(div, data) {
+        try {
+            let target = div.getAttribute('_for');
+            if (!target) {
+                return data;
+            } else if (/^\[.*\]$|^\{.*\}$/.test(target)) {
+                return JSON.parse(target);
+            } else if (data && target in data) {
+                return data[target];
+            } else if (target in window) {
+                return window[target];
+            } else {
+                return data;
+            }
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+
+    forValue(data, index) {
+        if (typeof (data) != typeof ({})) {
+            data = { _this: data, _value: data };
+        }
+        data._index = index;
+        return data;
+    }
+
+    forReplace(div, data) {
         Array.from(div.attributes).forEach((attr) => {
-            attr.value = this.forBrackets(attr.value, data, index);
+            if (['_if', '_else'].includes(attr.name)) {
+                let value = data[attr.value];
+                value = typeof (value) == typeof (1) || value;
+                if ((attr.name == '_if' && value) || (attr.name == '_else' && !value)) {
+                    div.removeAttribute(attr.name);
+                } else {
+                    div.setAttribute('_retard', true);
+                }
+            } else {
+                attr.value = this.forBrackets(attr.value, data);
+            }
         });
         Array.from(div.childNodes).forEach((node) => {
             if (node.nodeType === Node.TEXT_NODE) {
-                node.nodeValue = this.forBrackets(node.nodeValue, data, index);
+                node.nodeValue = this.forBrackets(node.nodeValue, data);
             } else if (node.nodeType === Node.ELEMENT_NODE) {
-                if (node.getAttribute('_level')) {
+                if (node.getAttribute('_for')) {
                     this.forClone(node, data);
                 } else {
-                    this.forReplace(node, data, index);
+                    this.forReplace(node, data);
                 }
             }
         });
     }
 
-    forBrackets(value, data, index) {
-        if (typeof (data) != typeof ({})) {
-            data = { _this: data, _value: data };
-        }
-        data._index = index;
-        let rule = /(?<=\{).*?(?=\})/g;
-        let match = value.match(rule);
+    forBrackets(value, data) {
+        let match = value.match(/(?<=\{).*?(?=\})/g);
         for (let i in match) {
             let text = match[i];
             let info = '';
