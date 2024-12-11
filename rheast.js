@@ -40,6 +40,7 @@ class RHEast {
                 return false;
             }
         } catch (e) { }
+        div.removeAttribute('_if');
         return true;
     }
 
