@@ -1,4 +1,4 @@
-// StaticRender v1.02 - Rheast.js
+// StaticRender v1.03 - Rheast.js
 
 class RHEast {
     constructor() {
@@ -10,7 +10,7 @@ class RHEast {
 
     forStyle() {
         let style = document.createElement('style');
-        style.textContent = '[_for] { visibility: hidden; }';
+        style.textContent = '[_for]{visibility:hidden;}[_keep]{display:none;}';
         document.querySelector('head').appendChild(style);
     }
 
@@ -24,23 +24,27 @@ class RHEast {
     }
 
     forClone(div, data) {
-        if (typeof (div) == typeof ('N')) {
+        if (typeof (div) == typeof ('')) {
             div = document.querySelector(div);
         }
         data = this.forData(div, data);
-        if (!div || !data) {
+        if (!div || !data || typeof (data) != typeof ([])) {
             return false;
         }
         for (let i in data) {
             let clone = div.cloneNode(true);
             clone.removeAttribute('_for');
             this.forReplace(clone, this.forValue(data[i], i), i);
-            clone.querySelectorAll('[_retard]').forEach(item => {
-                item.remove();
-            });
-            div.parentNode.insertBefore(clone, div);
+            if (!clone.hasAttribute('_retard')) {
+                clone.querySelectorAll('[_retard]').forEach(item => {
+                    item.remove();
+                });
+                div.parentNode.insertBefore(clone, div);
+            }
         }
-        div.remove();
+        if (!div.hasAttribute('_keep')) {
+            div.remove();
+        }
     }
 
     forData(div, data) {
@@ -83,6 +87,15 @@ class RHEast {
                 }
             } else {
                 attr.value = this.forBrackets(attr.value, data);
+                if (attr.name[0] == '_') {
+                    let name = attr.name.replace(/^_/, '');
+                    let value = div.getAttribute(name);
+                    if (!value) {
+                        value = '';
+                    }
+                    div.setAttribute(name, value + attr.value);
+                    div.removeAttribute(attr.name);
+                }
             }
         });
         Array.from(div.childNodes).forEach((node) => {

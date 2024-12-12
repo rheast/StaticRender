@@ -8,32 +8,42 @@
 <body>
     <ul>
         <li _for="myData">
-            <div class="{color}">
-                <span>{_index}</span>
-                <span>{name}</span>
-            </div>
             <div>
-                <div _for="data" _if="time">
-                    <span>{_index}</span>
-                    <span>{time}</span>
-                    <span>{text}</span>
-                </div>
-                <span _for="data" _else="time">
+                <span _style="color:{color};">{name}</span>
+            </div>
+            <table _if="table">
+                <tbody>
+                    <tr _for="data">
+                        <td>{_index}</td>
+                        <td>{time}</td>
+                        <td>{text}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div _else="table">
+                <span _for="data">
                     <span>{_value}</span>
                 </span>
             </div>
         </li>
         <li>
             <div>
-                <span _for="[2, 0, 4, 8]">{_this}</span>
+                <span _for="[1,2,3]">
+                    <span>{_this}</span>
+                </span>
             </div>
         </li>
-        <li _for class="newData {color}">
-            <div>
-                <span>{name}</span>
-                <span>{age}</span>
-                <span>{city}</span>
-            </div>
+        <li _for="newData" _keep>
+            <div>{time}</div>
+            <table>
+                <tbody>
+                    <tr _for="data">
+                        <td _style="color:{color};">{name}</td>
+                        <td>{age}</td>
+                        <td>{city}</td>
+                    </tr>
+                </tbody>
+            </table>
         </li>
     </ul>
 
@@ -41,7 +51,7 @@
         var myData = [
             {
                 name: 'Adam',
-                data: Array.from({ length: 9 }, (_, i) => Math.pow(2, i + 1)),
+                data: Array.from({ length: 9 }, (_, i) => Math.pow(2, i)),
             },
             {
                 name: 'Bob',
@@ -56,24 +66,32 @@
                     { time: 'Wednesday', text: 'Tomorrow' },
                 ],
                 color: 'blue',
+                table: true,
             },
         ];
 
-        setTimeout(() => {
-            let data = {
-                "status": 200,
-                "message": "Request successful",
-                "data": [
-                    { "name": "Alice", "age": 30, "city": "New York" },
-                    { "name": "Bob", "age": 25, "city": "Los Angeles", color: "red" },
-                    { "name": "Charlie", "age": 35, "city": "Chicago", color: "blue" },
-                ]
-            };
-            rheast.forClone('.newData', data.data);
-        }, 3000);
+        for (let i in [...Array(3)]) {
+            setTimeout(() => {
+                let data = {
+                    "status": 200,
+                    "message": "Request successful",
+                    "data": [
+                        {
+                            "time": new Date().getFullYear() + i * 1,
+                            "data": [
+                                { "name": "Alice", "age": 39 + i * 1, "city": "New York", color: "inherit" },
+                                { "name": "Bob", "age": 28 + i * 1, "city": "Los Angeles", color: "red" },
+                                { "name": "Charlie", "age": 25 + i * 1, "city": "Chicago", color: "blue" },
+                            ],
+                        }
+                    ],
+                };
+                rheast.forClone('[_for="newData"]', data.data);
+            }, 3000 * i);
+        }
 
         let myStyle = document.createElement('style');
-        myStyle.textContent = '.red { color: red; } .blue { color: blue; } li { padding: .5em 0; }';
+        myStyle.textContent = 'li{padding:.5em 0;}td{padding-right:1em}table{border-spacing:0;}';
         document.querySelector('head').appendChild(myStyle);
     </script>
 </body>
